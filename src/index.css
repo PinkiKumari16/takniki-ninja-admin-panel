@@ -1,0 +1,10 @@
+@import "tailwindcss";
+@theme {
+  --color-primary: #0A192F;
+  --color-secondary: rgb(39, 39, 42, 1);
+  --color-light-gray: #7c7c7e;
+  --color-sidebar-color: hsla(220, 30%, 8%, 1);
+  --color-gray: hsla(210,20%, 98%, 0.2);
+  --color-border-color: #162f5f;
+}
+
