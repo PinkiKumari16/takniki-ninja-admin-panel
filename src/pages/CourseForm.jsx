@@ -1,157 +1,328 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Input, message, Select } from "antd";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { setReloadData, setSelectedEditCourseData } from "../redux/rootSlice";
-import TextArea from "antd/es/input/TextArea";
+import {
+  hideLoading,
+  setReloadData,
+  setSelectedEditCourseData,
+  showLoading,
+} from "../redux/rootSlice";
+import axios from "axios";
+import { Loader } from "../components/Loader";
+
+const { TextArea } = Input;
 
 export const CourseForm = () => {
-  const [file, setFile] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const navigate = useNavigate();
+  const [form] = Form.useForm();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { selectedEditCourseData, loading } = useSelector(
+    (state) => state.root
+  );
 
-  const { selectedEditCourseData } = useSelector((state) => state.root);
-  console.log(selectedEditCourseData);
-  const addAndEditCourse = async (values) => {
-    console.log(values);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [sections, setSections] = useState([]);
+  const [thumbnail, setThumbnail] = useState(null);
+
+  // Pre-fill form when editing
+  const fetchOneCourseData = async (id) => {
+    dispatch(showLoading());
+    try {
+      const response = await axios.get(
+        `https://abhinash.itflyweb.cloud/api/getCourseDetails.php?course_id=${id}`
+      );
+      if (response.data) {
+        form.setFieldsValue({
+          ...response.data,
+        });
+        setSections(response.data.sections || []);
+      }
+    } catch (error) {
+      message.error(error);
+    } finally {
+      dispatch(hideLoading());
+    }
   };
 
-  const handleFileUpload = (e) => {
-    const selectedFile = e.target.files[0];
-    setFile(selectedFile);
+  useEffect(() => {
+    if (selectedEditCourseData) {
+      fetchOneCourseData(selectedEditCourseData.id);
+    }
+  }, [selectedEditCourseData]);
+
+  const addAndEditCourse = async (values) => {
+    setIsSubmitting(true);
+    try {
+      const formData = new FormData();
+
+      const courseData = {
+        course: {
+          ...values,
+          thumbnail_image: "",
+        },
+        sections,
+      };
+
+      formData.append("course", JSON.stringify(courseData));
+      if (thumbnail) {
+        formData.append("thumbnail_image", thumbnail);
+      }
+
+      const res = await axios.post(
+        "https://abhinash.itflyweb.cloud/api/insert_course.php",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
+      message.success("Course saved successfully!");
+      dispatch(setSelectedEditCourseData(null));
+      dispatch(setReloadData(true));
+      navigate("/admin-panel");
+    } catch (error) {
+      message.error("Something went wrong!");
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+      dispatch(setReloadData(false));
+    }
+  };
+
+  const handleSectionChange = (index, field, value) => {
+    const updated = [...sections];
+    updated[index][field] = value;
+    setSections(updated);
+  };
+
+  const handleLectureChange = (sectionIndex, lectureIndex, field, value) => {
+    const updated = [...sections];
+    updated[sectionIndex].lectures[lectureIndex][field] = value;
+    setSections(updated);
+  };
+
+  const addSection = () => {
+    setSections([
+      ...sections,
+      { section_title: "", total_duration: "", lectures: [] },
+    ]);
+  };
+
+  const addLecture = (sectionIndex) => {
+    const updated = [...sections];
+    updated[sectionIndex].lectures.push({
+      lecture_title: "",
+      duration: "",
+      videoUrl: "",
+    });
+    setSections(updated);
   };
 
   return (
     <>
-      <div>
-        <h1 className="text-center text-2xl bg-primary text-white py-2 mb-5">
-          <u>{selectedEditCourseData ? "Edit Course" : "Add Course"}</u>
-        </h1>
-        <div className="p-6">
-          <Form
-            layout="vertical"
-            onFinish={addAndEditCourse}
-            initialValues={selectedEditCourseData}
-            key={selectedEditCourseData ? selectedEditCourseData.id : "true"}
-          >
-            <Form.Item label="Blog Title" name="title">
-              <Input></Input>
-            </Form.Item>
-            <Form.Item label="Blog Image URL" name="thumbnail_image">
-              <Input></Input>
-            </Form.Item>
-            <Form.Item label="Short Description" name="description">
-              <Input></Input>
-            </Form.Item>
-            <Form.Item label="Long Description" name="longDescription">
-              <TextArea></TextArea>
-            </Form.Item>
-            <Form.Item label="Requirement" name="requirement">
-              <Input></Input>
-            </Form.Item>
-            <Form.Item label="Syllabus" name="syllabus">
-              <Input></Input>
-            </Form.Item>
-            <Form.Item label="Last Updated At" name="lastUpdatedAt">
-              <Input type="date"></Input>
-            </Form.Item>
-            <Form.Item
-              label="Course Language"
-              name="language"
-              rules={[
-                {
-                  message: "Please select the course language!",
-                },
-              ]}
-            >
-              <Select placeholder="Select Course Language">
-                <Select.Option value="English">English</Select.Option>
-                <Select.Option value="Spanish">Spanish</Select.Option>
-                <Select.Option value="French">French</Select.Option>
-                <Select.Option value="German">German</Select.Option>
-              </Select>
-            </Form.Item>
+      {loading ? (
+        <Loader />
+      ) : (
+        <div>
+          <h1 className="text-center text-2xl bg-primary text-white py-2 mb-5">
+            <u>{selectedEditCourseData ? "Edit Course" : "Add Course"}</u>
+          </h1>
 
-            <Form.Item label="Created By" name="instructor">
-              <Input></Input>
-            </Form.Item>
-            <Form.Item label="Course Duration" name="duration">
-              <Input></Input>
-            </Form.Item>
-            <Form.Item label="Total Lecture" name="lessons">
-              <Input type="number"></Input>
-            </Form.Item>
-            <Form.Item label="Trailer Video" name="trailerVideo">
-              <Input></Input>
-            </Form.Item>
-            <Form.Item label="Total Section" name="totalSection">
-              <Input type="number"></Input>
-            </Form.Item>
-            <Form.Item label="Course Materials" name="courseMaterials">
-              <Input></Input>
-            </Form.Item>
-            <Form.Item
-              label="Level"
-              name="level"
-              rules={[{ message: "Please select the course level!" }]}
-            >
-              <Select placeholder="Select Course Level">
-                <Select.Option value="beginner">Beginner</Select.Option>
-                <Select.Option value="intermediate">Intermediate</Select.Option>
-                <Select.Option value="advanced">Advanced</Select.Option>
-              </Select>
-            </Form.Item>
-            <Form.Item label="Discount" name="discount">
-              <Input></Input>
-            </Form.Item>
-            <Form.Item label="Real Price" name="original_price">
-              <Input></Input>
-            </Form.Item>
-            <Form.Item label="Discount Price" name="discounted_price">
-              <Input></Input>
-            </Form.Item>
-            <Form.Item
-              label="Course Status"
-              name="courseStatus"
-              rules={[{ message: "Please select the course status!" }]}
-            >
-              <Select placeholder="Select Course Status">
-                <Select.Option value="active">Active</Select.Option>
-                <Select.Option value="inactive">In Active</Select.Option>
-              </Select>
-            </Form.Item>
-            <Form.Item label="Summary" name="summary">
-              <TextArea></TextArea>
-            </Form.Item>
+          <div className="p-6">
+            <Form layout="vertical" form={form} onFinish={addAndEditCourse}>
+              <Form.Item label="Course Title" name="title">
+                <Input />
+              </Form.Item>
 
-            <div className="flex justify-end gap-5">
-              <button
-                className="border px-5 py-1 border-primary !text-primary cursor-pointer"
-                onClick={(e) => {
-                  e.preventDefault();
-                  dispatch(setSelectedEditCourseData(null));
-                  navigate("/admin-panel");
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                className="!text-white bg-primary px-5 py-1 cursor-pointer"
-                type="submit"
-                disabled={isSubmitting}
-              >
-                {isSubmitting
-                  ? "Submitting..."
-                  : selectedEditCourseData
-                  ? "Edit"
-                  : "Add"}
-              </button>
-            </div>
-          </Form>
+              <Form.Item label="Course Thumbnail Image" name="thumbnail_image">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setThumbnail(e.target.files[0])}
+                />
+                {selectedEditCourseData?.thumbnail_image && (
+                  <img
+                    src={`https://abhinash.itflyweb.cloud/api/${selectedEditCourseData.thumbnail_image}`}
+                    alt="Thumbnail"
+                    style={{ width: 120, marginTop: 10 }}
+                  />
+                )}
+              </Form.Item>
+
+              <Form.Item label="Short Description" name="description">
+                <TextArea rows={3} />
+              </Form.Item>
+
+              <Form.Item label="Course Language" name="language">
+                <Select placeholder="Select Language">
+                  <Select.Option value="English">English</Select.Option>
+                  <Select.Option value="Spanish">Spanish</Select.Option>
+                  <Select.Option value="French">French</Select.Option>
+                  <Select.Option value="German">German</Select.Option>
+                </Select>
+              </Form.Item>
+
+              <Form.Item label="Instructor" name="instructor">
+                <Input />
+              </Form.Item>
+
+              <Form.Item label="Course Duration" name="duration">
+                <Input />
+              </Form.Item>
+
+              <Form.Item label="Total Lectures" name="lessons">
+                <Input type="number" />
+              </Form.Item>
+
+              <Form.Item label="Level" name="level">
+                <Select placeholder="Select Level">
+                  <Select.Option value="Beginner">Beginner</Select.Option>
+                  <Select.Option value="Intermediate">
+                    Intermediate
+                  </Select.Option>
+                  <Select.Option value="Advanced">Advanced</Select.Option>
+                </Select>
+              </Form.Item>
+
+              <Form.Item label="Discount" name="discount">
+                <Input />
+              </Form.Item>
+
+              <Form.Item label="Original Price" name="original_price">
+                <Input />
+              </Form.Item>
+
+              <Form.Item label="Discounted Price" name="discounted_price">
+                <Input />
+              </Form.Item>
+
+              {/* Sections & Lectures */}
+              <div className="my-4">
+                <h2 className="text-lg font-semibold mb-2">Sections</h2>
+                <button
+                  type="button"
+                  onClick={addSection}
+                  className="mb-4 px-6 py-2 bg-blue-500 text-white rounded"
+                >
+                  Add Section
+                </button>
+
+                {sections.map((section, sectionIndex) => (
+                  <div
+                    key={sectionIndex}
+                    className="border p-4 mb-6 rounded bg-gray-50 shadow-sm"
+                  >
+                    <Input
+                      className="mb-2"
+                      placeholder="Section Title"
+                      value={section.section_title}
+                      onChange={(e) =>
+                        handleSectionChange(
+                          sectionIndex,
+                          "section_title",
+                          e.target.value
+                        )
+                      }
+                    />
+                    <Input
+                      className="mb-4"
+                      placeholder="Total Duration"
+                      value={section.total_duration}
+                      onChange={(e) =>
+                        handleSectionChange(
+                          sectionIndex,
+                          "total_duration",
+                          e.target.value
+                        )
+                      }
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => addLecture(sectionIndex)}
+                      className="my-3 px-3 py-1 bg-green-500 text-white rounded"
+                    >
+                      Add Lecture
+                    </button>
+
+                    {section.lectures?.map((lecture, lectureIndex) => (
+                      <div
+                        key={lectureIndex}
+                        className="border p-3 mb-3 rounded bg-white shadow-inner"
+                      >
+                        <Input
+                          className="mb-2"
+                          placeholder="Lecture Title"
+                          value={lecture.lecture_title}
+                          onChange={(e) =>
+                            handleLectureChange(
+                              sectionIndex,
+                              lectureIndex,
+                              "lecture_title",
+                              e.target.value
+                            )
+                          }
+                        />
+                        <Input
+                          className="mb-2"
+                          placeholder="Duration"
+                          value={lecture.duration}
+                          onChange={(e) =>
+                            handleLectureChange(
+                              sectionIndex,
+                              lectureIndex,
+                              "duration",
+                              e.target.value
+                            )
+                          }
+                        />
+                        <Input
+                          className="mb-2"
+                          placeholder="Video URL"
+                          value={lecture.videoUrl}
+                          onChange={(e) =>
+                            handleLectureChange(
+                              sectionIndex,
+                              lectureIndex,
+                              "videoUrl",
+                              e.target.value
+                            )
+                          }
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex justify-end gap-5">
+                <button
+                  className="border px-5 py-1 border-primary text-primary rounded"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    dispatch(setSelectedEditCourseData(null));
+                    navigate("/admin-panel");
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="bg-primary text-white px-5 py-1 rounded"
+                  type="submit"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting
+                    ? "Submitting..."
+                    : selectedEditCourseData
+                    ? "Update"
+                    : "Add"}
+                </button>
+              </div>
+            </Form>
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 };

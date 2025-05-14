@@ -5,6 +5,7 @@ import { Login } from './pages/Login'
 import { Home } from './pages/Home'
 import { BlogForm } from './pages/BlogForm'
 import { CourseForm } from './pages/CourseForm'
+import { AddBlogContent } from './pages/AddBlogContent'
 
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
           <Route path='/' element={<Login />}/>
           <Route path='/admin-panel' element={<Home />} />
           <Route path='/blog-form' element={<BlogForm />} />
+          <Route path='/content-form/:blogId' element={<AddBlogContent />} />
           <Route path='/course-form' element={<CourseForm />} />
         </Routes>
       </BrowserRouter>

@@ -3,37 +3,6 @@ import { useDispatch } from "react-redux";
 import { setSelectedEditCourseData } from "../redux/rootSlice";
 import { useNavigate } from "react-router-dom";
 
-// export const CourseCard = ({
-//   course,
-//   setCourseFormShow,
-//   setSeletedEditData,
-// }) => {
-//   return (
-//     <>
-//       <div className="border-2 border-gray rounded p-4 bg-secondary shadow-md">
-//         <img
-//           src={course.thumbnail}
-//           alt={course.title}
-//           className="w-full h-32 object-cover rounded mb-2"
-//         />
-//         <h2 className="text-lg font-bold mb-2 text-center text-white">{course.title}</h2>
-//         <p className="line-clamp-3 text-gray-600 mb-2">{course.longDescription}</p>
-//         <div className="flex gap-5 justify-end">
-//           <button className="py-1 px-3 bg-light-gray text-white">Delete</button>
-//           <button
-//             className="py-1 px-3 border border-border-color bg-primary text-white"
-//             onClick={() => {
-//               setCourseFormShow(true);
-//               setSeletedEditData(course);
-//             }}
-//           >
-//             Edit
-//           </button>
-//         </div>
-//       </div>
-//     </>
-//   );
-// };
 export const CourseCard = ({ course }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();

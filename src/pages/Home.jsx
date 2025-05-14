@@ -12,7 +12,6 @@ import {
   setReloadData,
   showLoading,
 } from "../redux/rootSlice";
-import { AddBlogContent } from "../sections/AddBlogContent";
 import axios from "axios";
 import { Loader } from "../components/Loader";
 
@@ -42,8 +41,10 @@ export const Home = () => {
   };
 
   useEffect(() => {
-    if (!(blogData || courseData)) getInitialData();
-  }, [blogData]);
+    if (!(blogData.length && courseData.length)) {
+      getInitialData();
+    }
+  }, [blogData, courseData]);
 
   useEffect(() => {
     if (isReloadData) {
@@ -61,8 +62,8 @@ export const Home = () => {
         return <CourseSection />;
       case "Source Code":
         return <SourceCodeSection />;
-      case "Add Blog Content":
-        return <AddBlogContent blogId={selectedBlog} />;
+      // case "Add Blog Content":
+      //   return <AddBlogContent blogId={selectedBlog} />;
       default:
         return <HomeSection />;
     }
@@ -109,7 +110,7 @@ export const Home = () => {
               >
                 Source Code
               </li>
-              <select
+              {/* <select
                 name="Add Blog Content"
                 id="add-blog-content"
                 className={`mt-4 p-2 w-full bg-sidebar-color text-white border border-border-color rounded transition-colors duration-300 cursor-pointer`}
@@ -126,7 +127,7 @@ export const Home = () => {
                       {blogItem.blog_name}
                     </option>
                   ))}
-              </select>
+              </select> */}
             </ul>
           </div>
           <div className="p-4 flex-1">{renderContent()}</div>
