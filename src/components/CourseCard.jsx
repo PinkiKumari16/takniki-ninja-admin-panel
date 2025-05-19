@@ -7,7 +7,7 @@ export const CourseCard = ({ course }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   return (
-    <div className="bg-white shadow-md border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer">
+    <div className="bg-white shadow-md shadow-border-color border border-border-color rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer">
       <div className="relative">
         <img
           src={`https://abhinash.itflyweb.cloud/api/${course.thumbnail_image}`}
@@ -22,7 +22,7 @@ export const CourseCard = ({ course }) => {
       {/* Course Details */}
       <div className="p-5 space-y-2">
         <h2 className="text-lg font-semibold text-gray-800">{course.title}</h2>
-        <p className="text-sm text-gray-600">{course.description}</p>
+        <p className="text-sm text-gray-600 line-clamp-3">{course.description}</p>
 
         <div className="flex flex-wrap items-center text-sm text-gray-700 gap-2">
           <span>👨‍🏫 By {course.instructor || "Instructor"}</span>
@@ -42,7 +42,7 @@ export const CourseCard = ({ course }) => {
         </div>
 
         <div className="flex gap-5 justify-end">
-          <button className="p-1 px-3 bg-light-gray text-white">Delete</button>
+          <button className="p-1 px-3 bg-red-500 text-white">Delete</button>
           <button
             className="p-1 px-3 bg-primary border border-border-color text-white"
             onClick={() => {

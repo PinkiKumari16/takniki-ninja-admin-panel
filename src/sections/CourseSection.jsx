@@ -7,12 +7,7 @@ import { useNavigate } from "react-router-dom";
 export const CourseSection = () => {
   const { courseData } = useSelector((state) => state.root);
   const navigate = useNavigate();
-  // const [isCourseFormShow, setCourseFormShow] = useState(false);
-  // const [seletedEditData, setSeletedEditData] = useState(null);
 
-  // const addAndEditCourse = () => {
-  //   console.log("form submmit...............");
-  // };
   return (
     <>
       <h1 className="text-3xl font-bold text-white text-center">Courses</h1>
@@ -33,8 +28,6 @@ export const CourseSection = () => {
           <CourseCard
             key={course.id}
             course={course}
-            // setCourseFormShow={setCourseFormShow}
-            // setSeletedEditData={setSeletedEditData}
           />
         ))}
       </div>

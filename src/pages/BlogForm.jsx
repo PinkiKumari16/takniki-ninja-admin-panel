@@ -16,13 +16,12 @@ export const BlogForm = () => {
   const [form] = Form.useForm();
 
   const { selectedEditBlogData } = useSelector((state) => state.root);
-  console.log(selectedEditBlogData);
+  // console.log(selectedEditBlogData);
   useEffect(() => {
     if (selectedEditBlogData) {
       setBlogId(selectedEditBlogData.id);
     }
   }, [selectedEditBlogData]);
-  console.log(blogId);
 
   const handleEditValues = () => {
     setIsEditDisable(false);

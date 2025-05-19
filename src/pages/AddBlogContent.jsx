@@ -77,7 +77,7 @@ export const AddBlogContent = () => {
           section_title: content.section_title,
         });
         setEditorContent(content.content);
-        setContentKey((prev) => prev + 1); // re-render editor
+        setContentKey((prev) => prev + 1); 
         setImageUrl(content.image_path);
       }
     } catch (error) {
@@ -111,15 +111,26 @@ export const AddBlogContent = () => {
       formData.append("image", file);
     } else if (contentData?.image_path) {
       formData.append("existing_image_path", contentData.image_path);
+      formData.append("content_id", contentData.id);
     }
 
     try {
-      const response = await axios.post(
-        "https://abhinash.itflyweb.cloud/api/insert_blog_content.php",
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
-
+      let response;
+      if (contentData) {
+        console.log("edit content..........");
+        response = await axios.post(
+          "https://abhinash.itflyweb.cloud/api/edit_blogContains.php",
+          formData,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+      } else {
+        console.log("add content..........");
+        response = await axios.post(
+          "https://abhinash.itflyweb.cloud/api/insert_blog_content.php",
+          formData,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+      }
       if (response.data.success) {
         message.success(response.data.message);
         dispatch(setReloadData(true));

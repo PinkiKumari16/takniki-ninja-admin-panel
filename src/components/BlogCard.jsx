@@ -29,7 +29,7 @@ export const BlogCard = ({ blog }) => {
 
   return (
     <>
-      <div className="border-2 border-gray rounded p-2 lg:p-4 bg-secondary">
+      <div className="border-2 border-border-color rounded p-2 lg:p-4 bg-transparent">
         <img
           src={"https://abhinash.itflyweb.cloud/api/" + image_path}
           alt={blog_name}
@@ -38,9 +38,9 @@ export const BlogCard = ({ blog }) => {
         <h2 className="text-lg font-bold text-center text-white">
           {blog_name}
         </h2>
-        <p className="line-clamp-3 text-gray-600 mb-2">{short_description}</p>
+        <p className="line-clamp-3 text-gray-200 mb-2">{short_description}</p>
         <div className="flex gap-5 justify-end">
-          <button className="p-1 px-3 bg-light-gray text-white">Delete</button>
+          <button className="p-1 px-3 bg-red-500 text-white">Delete</button>
           <button
             className="p-1 px-3 bg-primary border border-border-color text-white"
             onClick={() => {

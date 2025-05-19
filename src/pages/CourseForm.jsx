@@ -25,7 +25,7 @@ export const CourseForm = () => {
   const [sections, setSections] = useState([]);
   const [thumbnail, setThumbnail] = useState(null);
 
-  // Pre-fill form when editing
+  // Fetch course details when editing
   const fetchOneCourseData = async (id) => {
     dispatch(showLoading());
     try {
@@ -33,13 +33,14 @@ export const CourseForm = () => {
         `https://abhinash.itflyweb.cloud/api/getCourseDetails.php?course_id=${id}`
       );
       if (response.data) {
-        form.setFieldsValue({
-          ...response.data,
-        });
+        console.log(response.data);
+        form.setFieldsValue({ ...response.data });
+        console.log(selectedEditCourseData);
         setSections(response.data.sections || []);
+        setThumbnail(response.data.thumbnail)
       }
     } catch (error) {
-      message.error(error);
+      message.error("Failed to fetch course details.");
     } finally {
       dispatch(hideLoading());
     }
@@ -57,39 +58,59 @@ export const CourseForm = () => {
       const formData = new FormData();
 
       const courseData = {
-        course: {
-          ...values,
-          thumbnail_image: "",
-        },
-        sections,
+        ...values,
+        thumbnail_image: "", 
       };
+      const payload = {
+        course: courseData,
+        sections: sections,
+      };
+      formData.append("course", JSON.stringify(payload));
 
-      formData.append("course", JSON.stringify(courseData));
       if (thumbnail) {
         formData.append("thumbnail_image", thumbnail);
       }
 
-      const res = await axios.post(
-        "https://abhinash.itflyweb.cloud/api/insert_course.php",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
+      let res;
+      if (selectedEditCourseData) {
+        formData.append("course_id", selectedEditCourseData.id);
+        res = await axios.post(
+          "https://abhinash.itflyweb.cloud/api/editCourse.php",
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          }
+        );
+        
+      } else {
+        console.log("add the data................");
+        res = await axios.post(
+          "https://abhinash.itflyweb.cloud/api/insert_course.php",
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          }
+        );
+      }S
 
-      message.success("Course saved successfully!");
-      dispatch(setSelectedEditCourseData(null));
-      dispatch(setReloadData(true));
-      navigate("/admin-panel");
+      if (res.data?.course_id || res.data?.success) {
+        message.success(res.data.message || "Operation successful");
+        dispatch(setSelectedEditCourseData(null));
+        dispatch(setReloadData(true));
+        navigate("/admin-panel");
+      } else {
+        message.warning(res.data.message || "Operation failed.");
+      }
     } catch (error) {
+      console.error("Error during course submission:", error);
       message.error("Something went wrong!");
-      console.error(error);
     } finally {
       setIsSubmitting(false);
       dispatch(setReloadData(false));
     }
   };
 
+  // Section & lecture logic
   const handleSectionChange = (index, field, value) => {
     const updated = [...sections];
     updated[index][field] = value;
@@ -249,47 +270,78 @@ export const CourseForm = () => {
                     {section.lectures?.map((lecture, lectureIndex) => (
                       <div
                         key={lectureIndex}
-                        className="border p-3 mb-3 rounded bg-white shadow-inner"
+                        className="border p-4 mb-4 rounded bg-white shadow-sm relative"
                       >
-                        <Input
-                          className="mb-2"
-                          placeholder="Lecture Title"
-                          value={lecture.lecture_title}
-                          onChange={(e) =>
-                            handleLectureChange(
-                              sectionIndex,
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div>
+                            <label className="text-sm font-medium">
+                              Lecture Title
+                            </label>
+                            <Input
+                              placeholder="e.g., Introduction to React"
+                              value={lecture.lecture_title}
+                              onChange={(e) =>
+                                handleLectureChange(
+                                  sectionIndex,
+                                  lectureIndex,
+                                  "lecture_title",
+                                  e.target.value
+                                )
+                              }
+                            />
+                          </div>
+
+                          <div>
+                            <label className="text-sm font-medium">
+                              Duration
+                            </label>
+                            <Input
+                              placeholder="e.g., 5:30"
+                              value={lecture.duration}
+                              onChange={(e) =>
+                                handleLectureChange(
+                                  sectionIndex,
+                                  lectureIndex,
+                                  "duration",
+                                  e.target.value
+                                )
+                              }
+                            />
+                          </div>
+
+                          <div>
+                            <label className="text-sm font-medium">
+                              Video URL
+                            </label>
+                            <Input
+                              placeholder="e.g., https://youtube.com/..."
+                              value={lecture.videoUrl}
+                              onChange={(e) =>
+                                handleLectureChange(
+                                  sectionIndex,
+                                  lectureIndex,
+                                  "videoUrl",
+                                  e.target.value
+                                )
+                              }
+                            />
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updatedSections = [...sections];
+                            updatedSections[sectionIndex].lectures.splice(
                               lectureIndex,
-                              "lecture_title",
-                              e.target.value
-                            )
-                          }
-                        />
-                        <Input
-                          className="mb-2"
-                          placeholder="Duration"
-                          value={lecture.duration}
-                          onChange={(e) =>
-                            handleLectureChange(
-                              sectionIndex,
-                              lectureIndex,
-                              "duration",
-                              e.target.value
-                            )
-                          }
-                        />
-                        <Input
-                          className="mb-2"
-                          placeholder="Video URL"
-                          value={lecture.videoUrl}
-                          onChange={(e) =>
-                            handleLectureChange(
-                              sectionIndex,
-                              lectureIndex,
-                              "videoUrl",
-                              e.target.value
-                            )
-                          }
-                        />
+                              1
+                            );
+                            setSections(updatedSections);
+                          }}
+                          className="absolute top-2 right-2 text-red-600 hover:text-red-800 text-sm"
+                        >
+                          ❌
+                        </button>
                       </div>
                     ))}
                   </div>

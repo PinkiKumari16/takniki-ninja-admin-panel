@@ -6,6 +6,7 @@ import { Home } from './pages/Home'
 import { BlogForm } from './pages/BlogForm'
 import { CourseForm } from './pages/CourseForm'
 import { AddBlogContent } from './pages/AddBlogContent'
+import { UserDetailsPage } from './pages/UserDetailsPage'
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
           <Route path='/blog-form' element={<BlogForm />} />
           <Route path='/content-form/:blogId' element={<AddBlogContent />} />
           <Route path='/course-form' element={<CourseForm />} />
+          <Route path='/users/:userId' element={<UserDetailsPage />} />
         </Routes>
       </BrowserRouter>
     </>

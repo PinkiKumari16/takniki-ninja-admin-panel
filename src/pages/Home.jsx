@@ -14,11 +14,11 @@ import {
 } from "../redux/rootSlice";
 import axios from "axios";
 import { Loader } from "../components/Loader";
+import { AllUsersSection } from "../sections/AllUsersSection";
 
 export const Home = () => {
   const { activeTab, blogData, loading, isReloadData, courseData } =
     useSelector((state) => state.root);
-  const [selectedBlog, setSelectedBlog] = useState("");
   const dispatch = useDispatch();
 
   const getInitialData = async () => {
@@ -62,8 +62,8 @@ export const Home = () => {
         return <CourseSection />;
       case "Source Code":
         return <SourceCodeSection />;
-      // case "Add Blog Content":
-      //   return <AddBlogContent blogId={selectedBlog} />;
+      case "All Users":
+        return <AllUsersSection />;
       default:
         return <HomeSection />;
     }
@@ -110,24 +110,14 @@ export const Home = () => {
               >
                 Source Code
               </li>
-              {/* <select
-                name="Add Blog Content"
-                id="add-blog-content"
-                className={`mt-4 p-2 w-full bg-sidebar-color text-white border border-border-color rounded transition-colors duration-300 cursor-pointer`}
-                onChange={(e) => {
-                  const selectedValue = e.target.value;
-                  dispatch(setActiveTab("Add Blog Content"));
-                  setSelectedBlog(selectedValue);
-                }}
+              <li
+                onClick={() => dispatch(setActiveTab("All Users"))}
+                className={`inactiveTab ${
+                  activeTab === "All Users" ? "activeTab" : ""
+                } transition-colors duration-300`}
               >
-                <option value="">Select Blog Content</option>
-                {blogData &&
-                  blogData.map((blogItem) => (
-                    <option value={blogItem.id} key={blogItem.id}>
-                      {blogItem.blog_name}
-                    </option>
-                  ))}
-              </select> */}
+                All Users
+              </li>
             </ul>
           </div>
           <div className="p-4 flex-1">{renderContent()}</div>
