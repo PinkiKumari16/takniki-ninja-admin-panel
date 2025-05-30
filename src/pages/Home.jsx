@@ -15,6 +15,7 @@ import {
 import axios from "axios";
 import { Loader } from "../components/Loader";
 import { AllUsersSection } from "../sections/AllUsersSection";
+import { AboutSection } from "../sections/AboutSection";
 
 export const Home = () => {
   const { activeTab, blogData, loading, isReloadData, courseData } =
@@ -64,6 +65,8 @@ export const Home = () => {
         return <SourceCodeSection />;
       case "All Users":
         return <AllUsersSection />;
+      case "About":
+        return <AboutSection />;
       default:
         return <HomeSection />;
     }
@@ -109,6 +112,14 @@ export const Home = () => {
                 } transition-colors duration-300`}
               >
                 Source Code
+              </li>
+              <li
+                onClick={() => dispatch(setActiveTab("About"))}
+                className={`inactiveTab ${
+                  activeTab === "About" ? "activeTab" : ""
+                } transition-colors duration-300`}
+              >
+                About
               </li>
               <li
                 onClick={() => dispatch(setActiveTab("All Users"))}

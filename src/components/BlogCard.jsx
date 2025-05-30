@@ -10,22 +10,22 @@ export const BlogCard = ({ blog }) => {
   const { image_path, blog_name, short_description } = blog;
   // console.log(image_path);
 
-  const getSelectedBlogData = async (id) => {
-    try {
-      const res = await axios.get(
-        "https://abhinash.itflyweb.cloud/api/get_blog_contents.php?blog_id=" +
-          id
-      );
-      console.log(res.data.contents[0]);
-      if (res.data.success) {
-        dispatch(setSelectedEditBlogData(res.data.contents[0]));
-      } else {
-        alert(res.data.message);
-      }
-    } catch (error) {
-      alert(error);
-    }
-  };
+  // const getSelectedBlogData = async (id) => {
+  //   try {
+  //     const res = await axios.get(
+  //       "https://abhinash.itflyweb.cloud/api/get_blog_contents.php?blog_id=" +
+  //         id
+  //     );
+  //     console.log(res.data.contents[0]);
+  //     if (res.data.success) {
+  //       dispatch(setSelectedEditBlogData(res.data.contents[0]));
+  //     } else {
+  //       alert(res.data.message);
+  //     }
+  //   } catch (error) {
+  //     alert(error);
+  //   }
+  // };
 
   return (
     <>
@@ -44,7 +44,6 @@ export const BlogCard = ({ blog }) => {
           <button
             className="p-1 px-3 bg-primary border border-border-color text-white"
             onClick={() => {
-              // getSelectedBlogData(blog.id);
               dispatch(setSelectedEditBlogData(blog));
               navigate("/blog-form");
             }}

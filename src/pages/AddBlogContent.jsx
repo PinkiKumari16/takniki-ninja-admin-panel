@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { hideLoading, setReloadData, showLoading } from "../redux/rootSlice";
 import { Loader } from "../components/Loader";
 
+
 export const AddBlogContent = () => {
   const [file, setFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -29,7 +30,7 @@ export const AddBlogContent = () => {
     toolbarAdaptive: false,
     showXPathInStatusbar: false,
     askBeforePasteFromWord: false,
-    askBeforePasteHTML: false,
+    askBeforePasteHTML: true,
     buttons: [
       "source",
       "|",
@@ -46,6 +47,7 @@ export const AddBlogContent = () => {
       "fontsize",
       "brush",
       "align",
+      "header",  // Added header support
       "|",
       "link",
       "image",
@@ -53,6 +55,7 @@ export const AddBlogContent = () => {
       "hr",
       "quote",
       "code",
+      "codeBlock", // Added code block support
       "|",
       "undo",
       "redo",
@@ -61,7 +64,9 @@ export const AddBlogContent = () => {
     uploader: {
       insertImageAsBase64URI: true,
     },
+    extraPlugins: ["codeBlock", "header"], // Enable code block and header plugins
   };
+  
 
   const fetchBlogContent = async (id) => {
     dispatch(showLoading());

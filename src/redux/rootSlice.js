@@ -8,6 +8,7 @@ const rootSlice = createSlice({
     isReloadData: false,
     selectedEditBlogData: null,
     selectedEditCourseData: null,
+    selectedEditSourceData: null,
     activeTab: "Home",
   },
   reducers: {
@@ -32,6 +33,9 @@ const rootSlice = createSlice({
     setSelectedEditCourseData: (state, action) => {
       state.selectedEditCourseData = action.payload;
     },
+    setSelectedEditSourceData: (state, action) => {
+      state.selectedEditSourceData = action.payload;
+    },
     setActiveTab: (state, action) => {
       state.activeTab = action.payload;
     },
@@ -46,6 +50,7 @@ export const {
   setReloadData,
   setSelectedEditBlogData,
   setSelectedEditCourseData,
+  setSelectedEditSourceData,
   setActiveTab,
   setCourseData,
 } = rootSlice.actions;

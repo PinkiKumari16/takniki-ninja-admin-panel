@@ -1,4 +1,6 @@
+import { Form, Input } from "antd";
 import React from "react";
+const {TextArea} = Input;
 
 export const HomeSection = ({ blogLength }) => {
   const totalData = [
@@ -23,21 +25,19 @@ export const HomeSection = ({ blogLength }) => {
       "Prime Codes": "50",
       Revenue: "$25,000",
     },
-    {
-      title: "Post Details",
-      "Total Posts": "250+",
-      "Published Posts": "120+",
-      "Prime Posts": "80",
-      Revenue: "$40,000",
-    },
   ];
+  const abc = (values) => {
+    let temUrls = (values.urls).split(',');
+    values.urls = temUrls;
+    console.log(values);
+  };
 
   return (
     <>
       <h1 className="text-3xl font-bold text-center text-white">
         Welcome to Admin Panel of Takniky Ninga
       </h1>
-      <div className="grid grid-col-1 md:grid-cols-2 gap-5 mt-6">
+      <div className="grid grid-col-2 md:grid-cols-3 gap-5 mt-6">
         {totalData.map((data, index) => {
           const { title, ...details } = data;
 
@@ -60,6 +60,27 @@ export const HomeSection = ({ blogLength }) => {
             </div>
           );
         })}
+      </div>
+      <div className="bg-gray-100 mt-5 w-1/2 flex justify-center py-8">
+        <Form onFinish={abc} layout="vertical"
+        className="w-9/10"
+        >
+          <h1 className="text-center text-2xl font-semibold underline mb-3">Hero Section</h1>
+          <div>
+            <Form.Item name="type" label="Type">
+              <Input></Input>
+            </Form.Item>
+          </div>
+          <div>
+            <Form.Item name="urls" label="URLs">
+              <TextArea row={3}/>            
+              </Form.Item>
+          </div>
+          <div className="flex justify-end">
+            <button className="px-4 bg-primary text-white py-1 rounded" type="submit"
+          >Save</button>
+          </div>
+        </Form>
       </div>
     </>
   );
