@@ -33,9 +33,9 @@ export const CourseForm = () => {
         `https://abhinash.itflyweb.cloud/api/getCourseDetails.php?course_id=${id}`
       );
       if (response.data) {
-        console.log(response.data);
+        // console.log(response.data);
         form.setFieldsValue({ ...response.data });
-        console.log(selectedEditCourseData);
+        // console.log(selectedEditCourseData);
         setSections(response.data.sections || []);
         setThumbnail(response.data.thumbnail)
       }
@@ -73,7 +73,10 @@ export const CourseForm = () => {
 
       let res;
       if (selectedEditCourseData) {
+        console.log(selectedEditCourseData);
+        console.log("editing course.................");
         formData.append("course_id", selectedEditCourseData.id);
+        
         res = await axios.post(
           "https://abhinash.itflyweb.cloud/api/editCourse.php",
           formData,
@@ -81,7 +84,6 @@ export const CourseForm = () => {
             headers: { "Content-Type": "multipart/form-data" },
           }
         );
-        
       } else {
         console.log("add the data................");
         res = await axios.post(
@@ -91,8 +93,8 @@ export const CourseForm = () => {
             headers: { "Content-Type": "multipart/form-data" },
           }
         );
-      }S
-
+      }
+      console.log(res.data);
       if (res.data?.course_id || res.data?.success) {
         message.success(res.data.message || "Operation successful");
         dispatch(setSelectedEditCourseData(null));
